@@ -4,14 +4,12 @@ document.getElementById('contextForm').addEventListener('submit', async function
   document.getElementById('message').innerText = "Generating LinkedIn message...";
   document.getElementById('image').src = "";
   document.getElementById('downloadLink').style.display = "none";
-
   try {
-    const response = await fetch('linkedin-ai-message-site.vercel.app/api/generateMessage', {
+    const response = await fetch('https://linkedin-ai-message-site.vercel.app/api/generateMessage', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ context }),
     });
-
     const data = await response.json();
     if (response.ok) {
       document.getElementById('message').innerText = data.message;
