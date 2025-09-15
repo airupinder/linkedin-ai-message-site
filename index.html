@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LinkedIn Message & Image Generator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>LinkedIn Message & Image Generator</h1>
+  <form id="contextForm">
+    <label for="context">Enter context:</label>
+    <input type="text" id="context" name="context" required>
+    <button type="submit">Generate</button>
+  </form>
+  <div id="output">
+    <h2>Generated LinkedIn Message:</h2>
+    <p id="message"></p>
+    <h2>Generated Image:</h2>
+    <img id="image" src="" alt="Generated image will appear here" style="max-width:400px;">
+    <br>
+    <a id="downloadLink" href="#" download="generated-image.png" style="display:none;">Download Image</a>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
