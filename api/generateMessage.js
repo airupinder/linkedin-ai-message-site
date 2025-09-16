@@ -1,4 +1,6 @@
-export default async function handler(req, res) {
+const fetch = require('node-fetch');
+
+module.exports = async function handler(req, res) {
   // Handle CORS preflight OPTIONS request
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -9,8 +11,6 @@ export default async function handler(req, res) {
 
   // Allow CORS for POST and other requests
   res.setHeader('Access-Control-Allow-Origin', '*');
-
-  const fetch = (await import('node-fetch')).default;
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -33,8 +33,14 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: 'gpt-4',
         messages: [
-          { role: 'system', content: 'You are a helpful assistant writing professional LinkedIn connection messages.' },
-          { role: 'user', content: `Write a LinkedIn message based on the following context: ${context}` },
+          {
+            role: 'system',
+            content: 'You are a helpful assistant writing professional LinkedIn connection messages.',
+          },
+          {
+            role: 'user',
+            content: `Write a LinkedIn message based on the following context: ${context}`,
+          },
         ],
         max_tokens: 150,
       }),
@@ -58,8 +64,14 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: 'gpt-4',
         messages: [
-          { role: 'system', content: 'You are a helpful assistant that writes engaging LinkedIn posts.' },
-          { role: 'user', content: `Write an engaging LinkedIn post suitable for a wide audience on this topic: ${context}` },
+          {
+            role: 'system',
+            content: 'You are a helpful assistant that writes engaging LinkedIn posts.',
+          },
+          {
+            role: 'user',
+            content: `Write an engaging LinkedIn post suitable for a wide audience on this topic: ${context}`,
+          },
         ],
         max_tokens: 150,
       }),
@@ -74,4 +86,8 @@ export default async function handler(req, res) {
     const linkedinPost = postData.choices[0].message.content;
 
     // Send back both outputs
-    res.status(200).json({ message: linkedinMessage
+    res.status(200).json({ message: linkedinMessage, post: linkedinPost });
+  } catch (error) {
+    res.status(500).json({ error: 'Error calling OpenAI API' });
+  }
+};
