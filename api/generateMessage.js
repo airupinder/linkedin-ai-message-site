@@ -71,7 +71,7 @@ module.exports = async function handler(req, res) {
     const linkedinPost = postData.choices[0].message.content;
     
     // Create enriched image prompt using the LinkedIn post text (first 100 characters)
-    const imagePrompt = `An inspiring, vibrant, text-free digital illustration symbolizing peace and social harmony based on this topic: ${context}`;
+    const imagePrompt = `High-quality, text-free, ghibli graphic art on this topic: ${context}`;
     
     // Generate Image using OpenAI Image API with enhanced prompt
     const imageResponse = await fetch('https://api.openai.com/v1/images/generations', {
