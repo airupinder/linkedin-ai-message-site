@@ -6,21 +6,21 @@ module.exports = async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     return res.status(204).end();
   }
-  
+
   res.setHeader('Access-Control-Allow-Origin', '*');
-  
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
-  
+
   const { context } = req.body;
-  
+
   if (!context) {
     return res.status(400).json({ error: 'No context provided' });
   }
-  
+
   try {
-    // Generate LinkedIn Message
+    // Generate LinkedIn Connection Message
     const messageResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -36,15 +36,15 @@ module.exports = async function handler(req, res) {
         max_tokens: 150,
       }),
     });
-    
+
     const messageData = await messageResponse.json();
-    
+
     if (!messageResponse.ok) {
       return res.status(messageResponse.status).json(messageData);
     }
-    
+
     const linkedinMessage = messageData.choices[0].message.content;
-    
+
     // Generate LinkedIn Post
     const postResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -61,19 +61,34 @@ module.exports = async function handler(req, res) {
         max_tokens: 150,
       }),
     });
-    
+
     const postData = await postResponse.json();
-    
+
     if (!postResponse.ok) {
       return res.status(postResponse.status).json(postData);
     }
-    
+
     const linkedinPost = postData.choices[0].message.content;
-    
-    // Create enriched image prompt using the LinkedIn post text (first 100 characters)
-    const imagePrompt = `Visual illustration of: ${linkedinPost.substring(0, 100)}. No text, no words, no letters in the image.`;
-    
-    // Generate Image using OpenAI Image API with enhanced prompt
+
+    // ENHANCED: Construct an image prompt based on context/theme
+    let imagePrompt;
+    const lowerContext = context.toLowerCase();
+
+    if (lowerContext.includes('taxi') || lowerContext.includes('transport') || lowerContext.includes('vehicle')) {
+      imagePrompt = "Simple minimalist illustration of a modern taxi cab, clean design, professional business style, no text, no words, no letters";
+    } else if (lowerContext.includes('technology') || lowerContext.includes('software') || lowerContext.includes('app')) {
+      imagePrompt = "Clean minimalist illustration of modern technology devices, professional business style, no text, no words, no letters";
+    } else if (lowerContext.includes('business') || lowerContext.includes('company') || lowerContext.includes('startup')) {
+      imagePrompt = "Professional minimalist business illustration, modern office elements, clean design, no text, no words, no letters";
+    } else if (lowerContext.includes('india') || lowerContext.includes('indian')) {
+      imagePrompt = "Minimalist illustration representing Indian business and culture, professional style, clean design, no text, no words, no letters";
+    } else {
+      // Fallback: Use key words from context
+      const keyWords = context.split(' ').slice(0, 3).join(' ');
+      imagePrompt = `Minimalist professional illustration representing ${keyWords}, clean modern design, simple business style, no text, no words, no letters`;
+    }
+
+    // Generate Image using OpenAI DALL-E API
     const imageResponse = await fetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
       headers: {
@@ -86,22 +101,21 @@ module.exports = async function handler(req, res) {
         size: "512x512"
       }),
     });
-    
+
     const imageData = await imageResponse.json();
-    
+
     if (!imageResponse.ok) {
       return res.status(imageResponse.status).json(imageData);
     }
-    
+
     const imageUrl = imageData.data[0].url;
-    
-    // Send back all generated data
+
+    // Final response
     res.status(200).json({
       message: linkedinMessage,
       post: linkedinPost,
-      imageUrl
+      imageUrl: imageUrl
     });
-    
   } catch (error) {
     res.status(500).json({ error: 'Error calling OpenAI API' });
   }
