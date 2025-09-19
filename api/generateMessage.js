@@ -70,23 +70,9 @@ module.exports = async function handler(req, res) {
 
     const linkedinPost = postData.choices[0].message.content;
 
-    // ENHANCED: Construct an image prompt based on context/theme
-    let imagePrompt;
-    const lowerContext = context.toLowerCase();
-
-    if (lowerContext.includes('taxi') || lowerContext.includes('transport') || lowerContext.includes('vehicle')) {
-      imagePrompt = "Simple minimalist illustration of a modern taxi cab, clean design, professional business style, no text, no words, no letters";
-    } else if (lowerContext.includes('technology') || lowerContext.includes('software') || lowerContext.includes('app')) {
-      imagePrompt = "Clean minimalist illustration of modern technology devices, professional business style, no text, no words, no letters";
-    } else if (lowerContext.includes('business') || lowerContext.includes('company') || lowerContext.includes('startup')) {
-      imagePrompt = "Professional minimalist business illustration, modern office elements, clean design, no text, no words, no letters";
-    } else if (lowerContext.includes('india') || lowerContext.includes('indian')) {
-      imagePrompt = "Minimalist illustration representing Indian business and culture, professional style, clean design, no text, no words, no letters";
-    } else {
-      // Fallback: Use key words from context
-      const keyWords = context.split(' ').slice(0, 3).join(' ');
-      imagePrompt = `Minimalist professional illustration representing ${keyWords}, clean modern design, simple business style, no text, no words, no letters`;
-    }
+    // Extract first 2-3 key words and create a focused visual prompt
+    const keyWords = context.split(' ').slice(0, 3).join(' ');
+    const imagePrompt = `Professional minimalist illustration of ${keyWords}, clean modern business design, simple visual style, no text, no words, no letters in the image`;
 
     // Generate Image using OpenAI DALL-E API
     const imageResponse = await fetch('https://api.openai.com/v1/images/generations', {
