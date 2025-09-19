@@ -73,28 +73,9 @@ module.exports = async function handler(req, res) {
     // Extract first 2-3 key words and create a focused visual prompt
     const keyWords = context.split(' ').slice(0, 3).join(' ');
     const imagePrompt = `Professional minimalist illustration of ${keyWords}, clean modern business design, simple visual style, no text, no words, no letters in the image`;
+    // Generate Image URL using Pollinations
+    const imageUrl = `https://pollinations.ai/p/${encodeURIComponent(imagePrompt)}`;
 
-    // Generate Image using OpenAI DALL-E API
-    const imageResponse = await fetch('https://api.openai.com/v1/images/generations', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        prompt: imagePrompt,
-        n: 1,
-        size: "512x512"
-      }),
-    });
-
-    const imageData = await imageResponse.json();
-
-    if (!imageResponse.ok) {
-      return res.status(imageResponse.status).json(imageData);
-    }
-
-    const imageUrl = imageData.data[0].url;
 
     // Final response
     res.status(200).json({
